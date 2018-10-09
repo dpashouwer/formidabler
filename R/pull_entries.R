@@ -7,7 +7,7 @@
 #'
 #' @return Returns the Formidable entries as a data frame.
 #' @export
-pull_formidable_entries <- function(url, my_username, my_password, page_size = 500){
+pull_entries <- function(url, my_username, my_password, page_size = 500){
 
   page <- 1
 
@@ -42,9 +42,19 @@ pull_formidable_entries <- function(url, my_username, my_password, page_size = 5
   purrr::map_df(all_entries, collapse_list_item_to_df)
 }
 
+
+collapse_multi_selection <- function(x){
+  if(length(x) > 1){
+    x <- str_flatten(x, collapse = "_")
+  } else x
+}
+
 # make tibble
 collapse_list_item_to_df <- function(x){
-  y <- purrr::flatten(x)
-  y <- y[names(y)]
-  tibble::as_tibble(y)
+  x %>%
+    flatten() %>%
+    map(collapse_multi_selection) %>%
+    flatten() %>%
+    as_tibble()
 }
+
