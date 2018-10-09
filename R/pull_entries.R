@@ -45,7 +45,7 @@ pull_entries <- function(url, my_username, my_password, page_size = 500){
 
 collapse_multi_selection <- function(x){
   if(length(x) > 1){
-    x <- str_flatten(x, collapse = "_")
+    x <- str_flatten(x, collapse = ", ")
   } else x
 }
 
