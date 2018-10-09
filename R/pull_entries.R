@@ -42,19 +42,19 @@ pull_entries <- function(url, my_username, my_password, page_size = 500){
   purrr::map_df(all_entries, collapse_list_item_to_df)
 }
 
-
+# collapse questions that have multiple selections
 collapse_multi_selection <- function(x){
   if(length(x) > 1){
-    x <- str_flatten(x, collapse = ", ")
+    x <- stringr::str_flatten(x, collapse = ", ")
   } else x
 }
 
 # make tibble
 collapse_list_item_to_df <- function(x){
   x %>%
-    flatten() %>%
+    purrr::flatten() %>%
     map(collapse_multi_selection) %>%
-    flatten() %>%
-    as_tibble()
+    purrr::flatten() %>%
+    tibble::as_tibble()
 }
 
