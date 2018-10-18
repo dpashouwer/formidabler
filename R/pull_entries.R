@@ -11,19 +11,20 @@ pull_entries <- function(url, my_username, my_password, page_size = 500){
 
   page <- 1
 
-  message("Retrieving page: ", page)
+  r <- httr::GET(url = paste0(url, "entries?page_size=", page_size, "&page=", page), config = httr::authenticate(my_username, my_password)) %>%
+    httr::stop_for_status(task = "pull data. Check url, username, and password.")
 
-  all_entries <- httr::GET(url = paste0(url, "entries?page_size=", page_size, "&page=", page), config = httr::authenticate(my_username, my_password)) %>%
+  all_entries <- r %>%
     httr::content("text") %>%
     jsonlite::fromJSON()
+
+  message("Retrieved page: ", page)
 
   next_page <- TRUE
 
   while(next_page){
 
     page <- page + 1
-
-    message("Retrieving page: ", page)
 
     # pull data from website
     page_data <- httr::GET(url = paste0(url, "entries?page_size=", page_size, "&page=", page), config = httr::authenticate(my_username, my_password)) %>%
@@ -36,6 +37,8 @@ pull_entries <- function(url, my_username, my_password, page_size = 500){
     } else {
       # make tbl_json
       all_entries <- dplyr::union(all_entries, page_data)
+
+      message("Retrieved page: ", page)
     }
   }
 
@@ -53,7 +56,7 @@ collapse_multi_selection <- function(x){
 collapse_list_item_to_df <- function(x){
   x %>%
     purrr::flatten() %>%
-    map(collapse_multi_selection) %>%
+    purrr::map(collapse_multi_selection) %>%
     purrr::flatten() %>%
     tibble::as_tibble()
 }
