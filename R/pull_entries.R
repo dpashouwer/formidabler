@@ -42,7 +42,9 @@ pull_entries <- function(url, my_username, my_password, page_size = 500){
     }
   }
 
-  purrr::map_df(all_entries, collapse_list_item_to_df)
+  purrr::map_df(all_entries, collapse_list_item_to_df) %>%
+    # replace empty with NA_character
+    dplyr::na_if("")
 }
 
 # collapse questions that have multiple selections
